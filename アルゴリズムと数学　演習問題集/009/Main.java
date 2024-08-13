@@ -1,35 +1,61 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        // 入力された整数
-        int n = sc.nextInt();
-        int s = sc.nextInt();
-
+        // 配列の要素数
+        int N = sc.nextInt();
+        // 目標の和
+        int S = sc.nextInt();
         // カードの配列
-        int[] card = new int[n];
+        int[] A = new int[N];
 
-        // カードを配列に入れていく
-        for (int i = 0; i < n; i++) {
-            card[i] = sc.nextInt();
-            System.out.println(card[i]);
+        for (int i = 0; i < N; i++) {
+            A[i] = sc.nextInt();
         }
 
-        // 部分和を確認するためのDP配列
-        boolean[] dp = new boolean[s + 1];
-        // 合計0はカードを選ばないことで達成可能
-        dp[0] = true;
+        // 合計がSかどうかのフラグ
+        boolean flag = true;
+        // 組み合わせを保存する配列
+        List<List<Integer>> combAll = new ArrayList<>();
 
-        // カードを使って部分和を作れるかを判定
-        for (int i = 0; i < n; i++) {
-            for (int j = s; j >= card[i]; j--) {
-                dp[j] = dp[j] || dp[j - card[i]];
+        for (int n = 1; n <= A.length; n++) {
+            combine(A, n, 0, new ArrayList<>(), combAll);
+        }
+
+        for (List<Integer> comb : combAll) {
+            // System.out.println(comb);
+            int sum = 0;
+            for (int num : comb) {
+                sum += num;
+            }
+            if (sum == S) {
+                System.out.println("Yes");
+                flag = false;
+                break;
             }
         }
 
-        // 出力
-        System.out.println(dp[s] ? "YES" : "NO");
+        if (flag) {
+            System.out.println("No");
+        }
+
+        sc.close();
+    }
+
+    private static void combine(int[] A, int n, int start, List<Integer> current, List<List<Integer>> combAll) {
+        if (current.size() == n) {
+            combAll.add(new ArrayList<>(current));
+            return;
+        }
+
+        for (int i = start; i < A.length; i++) {
+            current.add(A[i]);
+            combine(A, n, i + 1, current, combAll);
+            current.remove(current.size() - 1);
+        }
     }
 }
